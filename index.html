@@ -1,1 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Curricular Interactiva</title>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body>
+  <h1>Malla Curricular Interactiva</h1>
+  <div id="malla" class="malla-container">
+    <!-- Aquí se inyectarán los cursos dinámicamente -->
+  </div>
+
+  <script>
+    const cursos = {
+      "Teoría de la Comunicación": {
+        creditos: 3,
+        desbloquea: ["Teoría y Métodos del Diseño 1"],
+        semestre: "1-1"
+      },
+      "Métodos y Técnicas de Investigación": {
+        creditos: 3,
+        desbloquea: ["Sociología y Desarrollo Humano", "Teoría y Métodos del Diseño 1", "Diseño Arquitectónico 1"],
+        semestre: "1-1"
+      },
+      "Fundamentos del Diseño": {
+        creditos: 5,
+        desbloquea: ["Teoría y Métodos del Diseño 1", "Diseño Arquitectónico 1"],
+        semestre: "1-1"
+      },
+      "Medios de Expresión": {
+        creditos: 4,
+        desbloquea: ["Diseño Arquitectónico 1", "Dibujo Natural"],
+        semestre: "1-1"
+      },
+      "Dibujo Geométrico": {
+        creditos: 4,
+        desbloquea: ["Diseño Arquitectónico 1", "Dibujo Técnico", "Dibujo Proyectual"],
+        semestre: "1-1"
+      },
+      "Geometria": {
+        creditos: 4,
+        desbloquea: ["Diseño Arquitectónico 1", "Dibujo Técnico", "Dibujo Proyectual"],
+        semestre: "1-1"
+      },
+      "Matemática 1": {
+        creditos: 4,
+        desbloquea: ["Matemática 2"],
+        semestre: "1-1"
+      },
+      "Sociología y Desarrollo Humano": {
+        creditos: 3,
+        desbloquea: ["Ecología Humana"],
+        semestre: "1-2"
+      },
+      "Teoría y Métodos del Diseño 1": {
+        creditos: 3,
+        desbloquea: ["Historia de la Arquitectura 1", "Diseño Arquitectónico 2"],
+        semestre: "1-2"
+      },
+      "Diseño Arquitectónico 1": {
+        creditos: 6,
+        desbloquea: ["Diseño Arquitectónico 2"],
+        semestre: "1-2"
+      },
+      // Puedes continuar agregando el resto aquí...
+    };
+
+    const estadoCursos = {};
+
+    function renderCursos() {
+      const contenedor = document.getElementById("malla");
+      contenedor.innerHTML = "";
+
+      const semestres = {};
+
+      for (const [nombre, info] of Object.entries(cursos)) {
+        if (!semestres[info.semestre]) semestres[info.semestre] = [];
+        semestres[info.semestre].push({ nombre, ...info });
+      }
+
+      for (const [semestre, lista] of Object.entries(semestres)) {
+        const div = document.createElement("div");
+        div.className = "semestre";
+        div.innerHTML = `<h2>Semestre ${semestre}</h2>`;
+        lista.forEach((curso) => {
+          const card = document.createElement("div");
+          card.className = "curso";
+          card.id = curso.nombre;
+
+          const btn = document.createElement("button");
+          btn.textContent = "Aprobar";
+          btn.className = "boton";
+          btn.disabled = !estadoCursos[curso.nombre] && !curso.requisitos;
+
+          btn.onclick = () => aprobarCurso(curso.nombre, btn);
+
+          card.innerHTML = `<h3>${curso.nombre}</h3><p>${curso.creditos} créditos</p>`;
+          card.appendChild(btn);
+          div.appendChild(card);
+        });
+        contenedor.appendChild(div);
+      }
+    }
+
+    function aprobarCurso(nombre, btn) {
+      estadoCursos[nombre] = true;
+      btn.disabled = true;
+      btn.classList.add("aprobado");
+
+      const desbloquea = cursos[nombre]?.desbloquea || [];
+      desbloquea.forEach((c) => {
+        const cursoElem = document.getElementById(c)?.querySelector("button");
+        if (cursoElem && !cursoElem.classList.contains("aprobado")) {
+          cursoElem.disabled = false;
+        }
+      });
+    }
+
+    window.onload = renderCursos;
+  </script>
+</body>
+</html>
 
